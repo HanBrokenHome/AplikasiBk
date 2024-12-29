@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Container, Typography, Breadcrumbs } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import New from '../newSiswa/New';
-import SettingsPage from '../pages/Setting';
-import SettingUser from './SettingNewuser';
-import DeleteUser from './DeleteUser';
-import Home from './Home';
-import AccountControl from './ControlUser';
-import NewAccount from './NewUser';
+import New from '../pages/ManageSiswa/New';
+import SettingsPage from '../pages/ManageSiswa/Setting';
+import SettingUser from './user/SettingNewuser';
+import DeleteUser from '../pages/ManageSiswa/DeleteUser';
+import Home from '../pages/ManageSiswa/Laporan';
+import AccountControl from '../pages/user/ControlUser';
+import NewAccount from '../pages/user/NewUser';
 
 const Dashboard = ({ onLogout }) => {
   const [user, setUser] = useState(null);

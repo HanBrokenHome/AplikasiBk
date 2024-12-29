@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Popover, TextField, Typography, Alert, MenuItem, Select } from '@mui/material';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth, db } from '../db/firebase';
+import { auth, db } from '../../db/firebase';
 import { collection, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 const AccountControl = () => {

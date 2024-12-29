@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { FaPrint, FaSearch } from "react-icons/fa";
-import "../css/Print.css";
+import "../../css/Print.css";
 import axios from "axios";
 import { Delete, PlusOne, Print, Save } from "@mui/icons-material";
 import * as XLSX from 'xlsx';
