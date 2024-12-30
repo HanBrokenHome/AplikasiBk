@@ -3,7 +3,6 @@ import { Button, Popover, TextField, Typography, Alert, MenuItem, Select, Circul
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth, db } from '../../../core/db/firebase'; // Import db firestore yang sudah disetting
 import { doc, getDocs, updateDoc, deleteDoc, collection } from 'firebase/firestore';
-
 const AccountControl = () => {
   const [accounts, setAccounts] = useState([]);
   const [selectedRole, setSelectedRole] = useState('');
@@ -16,21 +15,18 @@ const AccountControl = () => {
   const [deleteAccountId, setDeleteAccountId] = useState(null);
 
   // Fungsi untuk mengambil data akun dari Firestore
+  
   const fetchAccounts = async () => {
-    setLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(db, 'accounts')); // Mengambil data dari koleksi 'accounts'
-      const accountsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAccounts(accountsData); // Menyimpan data akun
-    } catch (err) {
-      console.error('Error fetching accounts:', err);
-    } finally {
-      setLoading(false);
+      const querySnapshot = await getDocs(collection(db, 'accounts'));
+      const accountsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log('Accounts fetched:', accountsData);
+      setAccounts(accountsData);  // Menyimpan data akun ke state
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
     }
   };
+  
 
   useEffect(() => {
     fetchAccounts(); // Memanggil fetchAccounts saat pertama kali component dimuat
