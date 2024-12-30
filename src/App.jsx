@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginForm from './components/main/loginSubmit/LoginForm';
-import Dashboard from './components/pages/Dashboard';
-import Maintenance from './components/maintenance/Maintenance';
-import Home from './components/pages/ManageSiswa/Laporan';
-import NewSiswa from './components/pages/ManageSiswa/New';
-import ChangePassword from './components/main/loginSubmit/ForgotPassword';
+import LoginForm from './components/ux/main/loginSubmit/LoginForm';
+import Dashboard from './components/ux/pages/Dashboard';
+import Maintenance from './components/ux/maintenance/Maintenance';
+import Home from './components/ux/pages/ManageSiswa/Laporan';
+import NewSiswa from './components/ux/pages/ManageSiswa/New';
+import ChangePassword from './components/ux/main/loginSubmit/ForgotPassword';
 
 // Komponen untuk melindungi rute privat
 const PrivateRoute = ({ isAuthenticated, children }) => {

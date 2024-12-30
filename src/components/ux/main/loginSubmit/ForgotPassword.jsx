@@ -1,7 +1,7 @@
 import { sendPasswordResetEmail } from 'firebase/auth'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { auth } from '../../db/firebase'
+import { auth } from '../../../core/db/firebase'
 const ChangePassword = () => {
   const [Email, setEmail] = useState('');
   const handleForgotPw = async() =>{

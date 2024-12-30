@@ -1,6 +1,6 @@
 // AddUserAndChangeRole.js
 import React, { useState, useEffect } from "react";
-import { db, auth } from "../db/firebase"; // Import Firebase yang sudah disetting
+import { db, auth } from '../../core/db/firebase'; // Import Firebase yang sudah disetting
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 

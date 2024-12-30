@@ -22,7 +22,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { getAuth } from "firebase/auth";
 
 
-const Home = () => {
+const Laporan = () => {
   const [Result, setResult] = useState(null);
   const [Input, setInput] = useState("");
   const [data, setData] = useState(null);
@@ -353,7 +353,6 @@ auth.currentUser.getIdToken().then((token) => {
   }}  
   onChange={(e) => handleUpdateRow(key, "Pelanggarans", e.target.value)}
 />
-
   </TableCell>
   <TableCell>
   <TextField
@@ -364,7 +363,6 @@ auth.currentUser.getIdToken().then((token) => {
   }}  
   onChange={(e) => handleUpdateRow(key, "Sanksi", e.target.value)}
 />
-
   </TableCell>
   <TableCell>
   <TextField
@@ -375,7 +373,6 @@ auth.currentUser.getIdToken().then((token) => {
   }}  
   onChange={(e) => handleUpdateRow(key, "TindakLanjut", e.target.value)}
 />
-
   </TableCell>
  <TableCell>
                         {row.photo ? (
@@ -496,9 +493,8 @@ auth.currentUser.getIdToken().then((token) => {
       ) : (
         <h1>Masukkan Nama Minimal 2 Kata</h1>
       )}
-
     </div>
   );
 };
 
-export default Home;
+export default Laporan;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, db } from '../../db/firebase';
+import { auth, db } from '../../../core/db/firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
@@ -22,39 +22,40 @@ const NewAccount = () => {
     // Validasi input
     if (!email || !password || !name) {
       setError('Email, password, and name are required.');
-      setLoading(false);
       return;
     }
-
-    try {
-      // Membuat pengguna dengan email dan password di Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Mengirimkan email verifikasi
-      await sendEmailVerification(user);
-
-      // Menyimpan data pengguna di Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        name,
-        email,
-        role,
-        uid: user.uid,
-      });
-
-      // Arahkan ke halaman login setelah registrasi berhasil
+    setTimeout(async() => {   
       setLoading(false);
-      navigate('/Login'); // Pindah ke halaman login setelah registrasi
-    } catch (error) {
-      setError('Registration failed: ' + error.message);
-      setLoading(false);
-    }
+      try {
+        // Membuat pengguna dengan email dan password di Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Mengirimkan email verifikasi
+        await sendEmailVerification(user);
+        
+        // Menyimpan data pengguna di Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+          name,
+          email,
+          role,
+          uid: user.uid,
+        });
+  
+        // Arahkan ke halaman login setelah registrasi berhasil
+        setLoading(false);
+        navigate('/Login'); // Pindah ke halaman login setelah registrasi
+      } catch (error) {
+        setError('Registration failed: ' + error.message);
+        setLoading(false);
+      }
+    }, 1500);
   };
 
   return (
     <section className="bg-gray-50 h-full dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="w-full text-black rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create a new account
@@ -111,16 +112,13 @@ const NewAccount = () => {
                 </select>
               </div>
               <div>
-                {loading ? (
-                  <CircularProgress />
-                ) : (
                   <button
+                  disabled={loading}
                     type="submit"
-                    className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    className={`w-full text-white ${loading ?"bg-slate-500 dark:bg-slate-600 hover:bg-slate-700" : "bg-primary-600 dark:bg-primary-600 hover:bg-primary-700"} focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
                   >
-                    Register
+                    {loading ? <CircularProgress/> : "Create"}
                   </button>
-                )}
               </div>
               {error && <Alert severity="error">{error}</Alert>}
             </form>

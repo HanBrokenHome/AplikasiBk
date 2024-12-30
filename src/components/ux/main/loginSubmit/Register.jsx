@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, db } from '../../db/firebase';
+import { auth, db } from '../../../core/db/firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';

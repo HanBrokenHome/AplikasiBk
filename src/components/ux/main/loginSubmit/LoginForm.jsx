@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../../db/firebase'; // Pastikan Anda mengimpor db untuk akses Firestore
+import { auth, db } from '../../../core/db/firebase'; // Pastikan Anda mengimpor db untuk akses Firestore
 import { TextField, Button, Alert, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Google } from '@mui/icons-material';
 import { doc, getDoc } from 'firebase/firestore';
 
 const LoginForm = ({ onLogin }) => {
