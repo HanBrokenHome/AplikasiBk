@@ -73,7 +73,7 @@ const Dashboard = ({ onLogout }) => {
     {user ? (
       <div className="flex transition-all w-screen h-full">
         {/* Hamburger Button (hanya tampil di tablet dan mobile) */}
-        <div className={`absolute top-5 z-[9999999] left-auto right-5 md:right-auto md:hidden`}>
+        <div className={`absolute print:hidden top-5 z-[9999999] left-auto right-5 md:right-auto md:hidden`}>
           <button
             className={`text-white p-3 bg-gray-800 rounded ${
               isSidebarOpen ? `bg-red-500` : `bg-blue-500`
@@ -86,7 +86,7 @@ const Dashboard = ({ onLogout }) => {
   
         {/* Sidebar */}
         <div
-        className={`w-56 bg-gray-800 text-white p-5 overflow-y-auto h-screen fixed top-0 transition-transform duration-300 ${
+        className={`w-56 bg-gray-800 text-white p-5 overflow-y-auto print:hidden h-screen fixed top-0 transition-transform duration-300 ${
           isSidebarOpen
             ? 'md:left-0 md:right-auto left-auto right-0'
             : 'md:left-0 md:right-auto -left-56 md:-right-auto right-0'
@@ -181,25 +181,27 @@ const Dashboard = ({ onLogout }) => {
   
         {/* Content Area */}
         <div
-          className={`flex-1 p-8 overflow-y-auto transition-all ${
+          className={`p-8 content-area flex-1 print:p-0 overflow-y-auto transition-all ${
             isSidebarOpen ? 'ml-0 md:ml-56' : 'ml-0'
           } ${isSidebarOpen ? 'mr-56' : 'mr-0'}`}
         >
           {/* Breadcrumb Navigation */}
-          <Breadcrumbs aria-label="breadcrumb">
+          <Breadcrumbs aria-label="breadcrumb" className='print:hidden'>
             <Link
               color="inherit"
               href="/"
+              className='print:hidden'
               onClick={(event) => {
                 event.preventDefault();
                 handlePageChange('Home');
-              }}
-            >
+              }}>
               Home
             </Link>
-            <Typography color="textPrimary">{selectedPage}</Typography>
+            <Typography color="textPrimary" sx={{"@media print" : {
+              display : 'none'
+            }}}>{selectedPage}</Typography>
           </Breadcrumbs>
-          <h1 className="text-4xl font-bold mb-5">{selectedPage} Page</h1>
+          <h1 className="text-4xl print:hidden font-bold mb-5">{selectedPage} Page</h1>
           <div className="bg-white w-full p-2 shadow-lg rounded">
             {selectedPage === 'Laporan' && <Laporan />}
             {selectedPage === 'Tambah Siswa' && <New />}
@@ -208,6 +210,7 @@ const Dashboard = ({ onLogout }) => {
             {selectedPage === 'Delete Siswa' && <DeleteUser />}
             {selectedPage === 'ControlAccount' && <AccountControl />}
             {selectedPage === 'Tambah Akun' && <NewAccount />}
+            {selectedPage === 'Home' && <p>Welcome The Dashboard {}</p>}
           </div>
         </div>
       </div>

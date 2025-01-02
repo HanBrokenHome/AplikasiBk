@@ -6,7 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableCell,
+  TableCell, 
   TableBody,
   Table,
   Paper,
@@ -28,25 +28,23 @@ const Laporan = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   // Fetch data dari API
   const databaseURL = import.meta.env.VITE_FIREBASE_DATABASE_URL;
+
+  const auth = getAuth();
   const fetchData = async () => {
-    setIsLoading(true); // Set loading ke true saat fetch data dimulai
+    setIsLoading(true); // Set loading to true
     const user = auth.currentUser;
   
     if (!user) {
-      setIsLoading(false); // Set loading ke false jika user tidak ditemukan
+      setIsLoading(false); // Set loading to false if user is not authenticated
       throw new Error("User not authenticated");
     }
   
-    // Ambil token autentikasi
     const token = await user.getIdToken();
-  
-    // Buat URL dengan token autentikasi
     const url = `${databaseURL}/.json?auth=${token}`;
   
-    // Fetch data
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -54,11 +52,11 @@ const Laporan = () => {
       }
   
       const data = await response.json();
-      setData(data); // Simpan data ke state
+      setData(data); // Save data to state
     } catch (error) {
-      setError(error.message); // Set error jika terjadi masalah
+      setError(error.message); // Set error if something goes wrong
     } finally {
-      setIsLoading(false); // Set loading ke false setelah fetch selesai
+      setIsLoading(false); // Set loading to false after fetch completes
     }
   };
   
@@ -255,12 +253,6 @@ const Laporan = () => {
       window.removeEventListener("beforeprint", handlePrint);
     };
   }, []);
-
-const auth = getAuth();
-auth.currentUser.getIdToken().then((token) => {
-});
-
-
   return (
     <div className="w-full h-auto">
       {/* Input Pencarian */}
@@ -289,8 +281,8 @@ auth.currentUser.getIdToken().then((token) => {
       {Result ? (
         <>
           {/* Informasi Siswa */}
-        <h1 className="text-center text-2xl print:bg-slate-400 font-bold pb-5">Catatan Pelanggaran Peserta Didik</h1>
-          <div id="Info" className="p-2 w-full gap-1 flex sm:flex sm:flex-col print:bg-slate-300">
+        <h1 className="text-center text-lg print:bg-slate-400 font-bold pb-5">Catatan Pelanggaran Peserta Didik</h1>
+          <div id="Info" className="text-xs p-2 w-full gap-1 flex sm:flex sm:flex-col print:bg-slate-300">
             <div>
             <h1 className="font-semibold">Informasi Siswa</h1>
             <li>Nama Siswa : {Result.NamaSiswa}</li>
@@ -310,17 +302,17 @@ auth.currentUser.getIdToken().then((token) => {
             </div>
           </div>
           {/* Tabel Pelanggaran */}
-          <TableContainer component={Paper} className="print:w-full my-4">
+          <TableContainer component={Paper} className="print:w-full">
             <Table>
               <TableHead>
-                <TableRow className="grid grid-cols-6">
-                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tanggal</TableCell>
-                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Pelanggaran</TableCell>
-                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Sanksi</TableCell>
-                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tindak Lanjut</TableCell>
-                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Gambar</TableCell>
+                <TableRow>
+                  <TableCell  style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tanggal</TableCell> 
+                  <TableCell  style={{ padding: '16px', whiteSpace: 'nowrap' }}>Pelanggaran</TableCell> 
+                  <TableCell  style={{ padding: '16px', whiteSpace: 'nowrap' }}>Sanksi</TableCell> 
+                  <TableCell  style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tindak Lanjut</TableCell> 
+                  <TableCell  style={{ padding: '16px', whiteSpace: 'nowrap' }}>Gambar</TableCell> 
                   <TableCell
-                    className="no-print"
+                     className="no-print"
                     sx={{
                       "@media print": {
                         display: "none",
@@ -328,53 +320,53 @@ auth.currentUser.getIdToken().then((token) => {
                     }}
                   >
                     Aksi
-                  </TableCell>
+                  </TableCell> 
                 </TableRow>
               </TableHead>
               <TableBody className="print:overflow-y-hidden">
                 {Result.PelanggaranList ? (
                   Object.entries(Result.PelanggaranList).map(([key, row]) => (
-                    <TableRow className="" key={key}>
-                      <TableCell>
+                    <TableRow key={key}>
+                      <TableCell sx={{width : '10px'}}> 
  <input
   type="date"
   value={row.Tanggal || ""} 
   onChange={(e) => handleUpdateRow(key, "Tanggal", e.target.value)}
-  className="px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  className=" py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 />
-</TableCell>
-  <TableCell>
+</TableCell> 
+  <TableCell> 
   <TextField
   className="text-sm"
   value={row.Pelanggarans}
   multiline
   InputProps={{
-    style: { fontSize: "12px", minWidth: "100px", maxWidth: "100px" },
+    style: { fontSize: "11px", minWidth: "120px", maxWidth: "120px" },
   }}  
   onChange={(e) => handleUpdateRow(key, "Pelanggarans", e.target.value)}
 />
-  </TableCell>
-  <TableCell>
+  </TableCell> 
+  <TableCell> 
   <TextField
   value={row.Sanksi}
   multiline
   InputProps={{
-    style: { fontSize: "12px", minWidth: "100px", maxWidth: "100px" },
+    style: { fontSize: "11px", minWidth: "120px", maxWidth: "120px" },
   }}  
   onChange={(e) => handleUpdateRow(key, "Sanksi", e.target.value)}
 />
-  </TableCell>
-  <TableCell>
+  </TableCell> 
+  <TableCell> 
   <TextField
   value={row.TindakLanjut}
   multiline
   InputProps={{
-    style: { fontSize: "12px", minWidth: "100px", maxWidth: "100px" },
+    style: { fontSize: "11px", minWidth: "120px", maxWidth: "120px" },
   }}  
   onChange={(e) => handleUpdateRow(key, "TindakLanjut", e.target.value)}
 />
-  </TableCell>
- <TableCell>
+  </TableCell> 
+ <TableCell> 
                         {row.photo ? (
                           <>
                           <div className="w-24">
@@ -414,9 +406,9 @@ auth.currentUser.getIdToken().then((token) => {
                             onChange={(e) => handlePhotoUpload(key, e)}
                           />
                         )}
-                      </TableCell>
+                      </TableCell> 
                       <TableCell
-                        className="no-print"
+                         className="no-print"
                         sx={{
                           "@media print": {
                             display: "none",
@@ -441,14 +433,14 @@ auth.currentUser.getIdToken().then((token) => {
                           style={{ marginLeft: "8px" }}
                         >
                         </Button>
-                      </TableCell>
+                      </TableCell> 
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
+                    <TableCell  colSpan={6} align="center">
                       Belum Ada Pelanggaran
-                    </TableCell>
+                    </TableCell> 
                   </TableRow>
                 )}
               </TableBody>

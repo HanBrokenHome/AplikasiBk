@@ -3,9 +3,9 @@ import { Button, Popover, TextField, Typography, Alert, MenuItem, Select, Circul
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth, db } from '../../../core/db/firebase'; // Import db firestore yang sudah disetting
 import { doc, getDocs, updateDoc, deleteDoc, collection } from 'firebase/firestore';
+
 const AccountControl = () => {
   const [accounts, setAccounts] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('');
   const [email, setEmail] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -15,18 +15,19 @@ const AccountControl = () => {
   const [deleteAccountId, setDeleteAccountId] = useState(null);
 
   // Fungsi untuk mengambil data akun dari Firestore
-  
   const fetchAccounts = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'accounts'));
-      const accountsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const querySnapshot = await getDocs(collection(db, 'users')); // Mengambil data dari koleksi 'users'
+      const accountsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // ID dokumen
+        ...doc.data(), // Data lainnya seperti email, name, role, uid
+      }));
       console.log('Accounts fetched:', accountsData);
-      setAccounts(accountsData);  // Menyimpan data akun ke state
+      setAccounts(accountsData); // Menyimpan data ke state
     } catch (error) {
       console.error('Error fetching accounts:', error);
     }
   };
-  
 
   useEffect(() => {
     fetchAccounts(); // Memanggil fetchAccounts saat pertama kali component dimuat
@@ -62,24 +63,36 @@ const AccountControl = () => {
   };
 
   const handleRoleChange = async (id, newRole) => {
-    try {
-      const accountRef = doc(db, 'accounts', id);
-      await updateDoc(accountRef, { role: newRole });
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((acc) =>
-          acc.id === id ? { ...acc, role: newRole } : acc
-        )
-      );
-    } catch (err) {
-      console.error('Error updating role:', err);
-    }
+    Swal.fire({
+      title: 'Are you sure you want to change the role?',
+      text: `You are about to change the role of the user to ${newRole}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Change',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const accountRef = doc(db, 'users', id); // Perbaiki koleksi 'users'
+          await updateDoc(accountRef, { role: newRole });
+          setAccounts((prevAccounts) =>
+            prevAccounts.map((acc) =>
+              acc.id === id ? { ...acc, role: newRole } : acc
+            )
+          );
+          Swal.fire('Role updated!', 'The user role has been changed.', 'success');
+        } catch (err) {
+          console.error('Error updating role:', err);
+        }
+      }
+    });
   };
 
   const handleDelete = async () => {
     if (!deleteAccountId) return;
 
     try {
-      await deleteDoc(doc(db, 'accounts', deleteAccountId)); // Menghapus data akun dari Firestore
+      await deleteDoc(doc(db, 'users', deleteAccountId)); // Perbaiki koleksi 'users'
       setAccounts((prevAccounts) =>
         prevAccounts.filter((acc) => acc.id !== deleteAccountId)
       );
@@ -120,7 +133,7 @@ const AccountControl = () => {
               borderRadius: '8px',
             }}
           >
-            <Typography variant="body1">{account.email}</Typography>
+            <Typography className='w-2/4' variant="body1">{account.name} ({account.email})</Typography>
             <Select
               value={account.role}
               onChange={(e) => handleRoleChange(account.id, e.target.value)}
@@ -128,6 +141,7 @@ const AccountControl = () => {
             >
               <MenuItem value="Admin">Admin</MenuItem>
               <MenuItem value="User">User</MenuItem>
+              <MenuItem value="SuperAdmin">SuperAdmin</MenuItem>
             </Select>
             <Button
               variant="outlined"
@@ -138,12 +152,12 @@ const AccountControl = () => {
             <Button
               variant="contained"
               color="error"
-              onClick={() => openDeleteDialog(account.id)} // Mengaktifkan dialog konfirmasi untuk hapus akun
+              onClick={() => openDeleteDialog(account.id)}
             >
               Delete
             </Button>
           </div>
-        ))
+        ))        
       )}
       <Popover
         open={open}

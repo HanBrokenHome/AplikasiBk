@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, TextField, CircularProgress } from '@mui/material';
 import { getAuth } from 'firebase/auth';
+import '../../css/kontrol.css'
 
 const SettingUser = () => {
   const [siswaData, setSiswaData] = useState([]);
