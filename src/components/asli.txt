@@ -1,0 +1,400 @@
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  TextField,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Table,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
+import { FaPrint, FaSearch } from "react-icons/fa";
+import "../css/Print.css";
+import axios from "axios";
+
+const Home = () => {
+  const [Result, setResult] = useState(null);
+  const [Input, setInput] = useState("");
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch data dari API
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(
+        "https://database-1b6ea-default-rtdb.firebaseio.com/.json"
+      );
+      setData(response.data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Tambah baris baru di tabel
+  const handleAddRow = () => {
+    if (Result) {
+      const newRow = {
+        Tanggal: "",
+        Pelanggarans: "",
+        Sanksi: "",
+        TindakLanjut: "",
+      };
+
+      const updatedResult = {
+        ...Result,
+        PelanggaranList: {
+          ...(Result.PelanggaranList || {}),
+          [`temp-${Date.now()}`]: newRow,
+        },
+      };
+
+      setResult(updatedResult);
+    }
+  };
+
+  // Update data di baris yang diubah
+  const handleUpdateRow = (key, field, value) => {
+    const updatedResult = {
+      ...Result,
+      PelanggaranList: {
+        ...Result.PelanggaranList,
+        [key]: {
+          ...Result.PelanggaranList[key],
+          [field]: value,
+        },
+      },
+    };
+    setResult(updatedResult);
+  };
+
+  // Simpan data ke backend
+  const handleSaveRow = async (key) => {
+    if (Result && Result.PelanggaranList[key]) {
+      const rowData = Result.PelanggaranList[key];
+
+      try {
+        const response = await axios.post(
+          `https://database-1b6ea-default-rtdb.firebaseio.com/${Result.id}/PelanggaranList.json`,
+          rowData
+        );
+
+        const newId = response.data.name;
+
+        const updatedResult = {
+          ...Result,
+          PelanggaranList: {
+            ...Result.PelanggaranList,
+            [key]: rowData,
+          },
+        };
+
+        setResult(updatedResult);
+
+        alert("Data berhasil disimpan!");
+      } catch {
+        alert("Gagal menyimpan data!");
+      }
+    }
+  };
+
+  // Hapus baris dari tabel
+  const handleDeleteRow = async (key) => {
+    if (Result && Result.PelanggaranList[key]) {
+      try {
+        await axios.delete(
+          `https://database-1b6ea-default-rtdb.firebaseio.com/${Result.id}/PelanggaranList/${key}.json`
+        );
+
+        const updatedResult = { ...Result };
+        delete updatedResult.PelanggaranList[key];
+        setResult(updatedResult);
+
+        alert("Data berhasil dihapus!");
+      } catch (error) {
+        alert("Gagal menghapus data!");
+      }
+    }
+  };
+
+  const handleSearch = () => {
+    if (!data) {
+      alert("Data belum selesai dimuat!");
+      return;
+    }
+  
+    const found = Object.entries(data).find(([key, value]) => {
+      console.log("Checking:", value);
+      return value?.NamaSiswa?.toLowerCase().includes(Input.toLowerCase().trim());
+    });
+  
+    console.log("Found:", found);
+  
+    if (found) {
+      setResult({ ...found[1], id: found[0] });
+    } else {
+      alert("Nama tidak ditemukan!");
+      setResult(null);
+    }
+  };
+  // Handle upload foto
+  const handlePhotoUpload = (key, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const updatedResult = {
+          ...Result,
+          PelanggaranList: {
+            ...Result.PelanggaranList,
+            [key]: {
+              ...Result.PelanggaranList[key],
+              photo: e.target.result,
+            },
+          },
+        };
+        setResult(updatedResult);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handlePrint = () => {
+      document.title = "";
+    };
+
+    window.addEventListener("beforeprint", handlePrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handlePrint);
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-auto">
+      {/* Input Pencarian */}
+      <div
+        id="Search-Name"
+        className="print:hidden w-full border h-56 flex justify-center items-center"
+      >
+        <TextField
+          label="Masukkan Nama"
+          className="w-96"
+          value={Input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        {isLoading ?
+        <CircularProgress/>
+        : 
+        <Button
+          disabled={isLoading}
+          onClick={handleSearch}
+          startIcon={<FaSearch />}
+        ></Button>
+        }
+      </div>
+
+      {/* Data Pelanggaran */}
+      {Result ? (
+        <>
+          {/* Informasi Siswa */}
+        <h1 className="text-center text-2xl font-bold pb-5">Catatan Pelanggaran Peserta Didik</h1>
+          <div id="Info" className="w-full gap-1">
+            <li>Nama Siswa : {Result.NamaSiswa}</li>
+            <li>Kelas : {Result.MenempatDiKelas}</li>
+            <li>Nama Ibu Siswa : {Result.NamaIbu}</li>
+            <li>Nama Bapak Siswa: {Result.NamaAyah}</li>
+            <li>Alamat Siswa: {Result.MenempatDiKelas}</li>
+          </div>
+
+          {/* Tabel Pelanggaran */}
+          <TableContainer component={Paper} className="print:w-full my-4">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tanggal</TableCell>
+                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Pelanggaran</TableCell>
+                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Sanksi</TableCell>
+                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Tindak Lanjut</TableCell>
+                  <TableCell style={{ padding: '16px', whiteSpace: 'nowrap' }}>Gambar</TableCell>
+                  <TableCell
+                    className="no-print"
+                    sx={{
+                      "@media print": {
+                        display: "none",
+                      },
+                    }}
+                  >
+                    Aksi
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Result.PelanggaranList ? (
+                  Object.entries(Result.PelanggaranList).map(([key, row]) => (
+                    <TableRow key={key}>
+                       <TableCell>
+    <TextField
+      className="text-sm"
+      value={row.Tanggal}
+      multiline
+      InputProps={{
+        style: { fontSize: "12px", resize: "none" } // Mengubah ukuran font di sini
+      }}
+      onChange={(e) => handleUpdateRow(key, "Tanggal", e.target.value)}
+    />
+  </TableCell>
+  <TableCell>
+    <TextField
+      className="text-sm"
+      value={row.Pelanggarans}
+      multiline
+      InputProps={{
+        style: { fontSize: "12px" } // Mengubah ukuran font di sini
+      }}
+      onChange={(e) => handleUpdateRow(key, "Pelanggarans", e.target.value)}
+    />
+  </TableCell>
+  <TableCell>
+    <TextField
+      value={row.Sanksi}
+      multiline
+      InputProps={{
+        style: { fontSize: "12px" } // Mengubah ukuran font di sini
+      }}
+      onChange={(e) => handleUpdateRow(key, "Sanksi", e.target.value)}
+    />
+  </TableCell>
+  <TableCell>
+    <TextField
+      value={row.TindakLanjut}
+      multiline
+      InputProps={{
+        style: { fontSize: "12px" } // Mengubah ukuran font di sini
+      }}
+      onChange={(e) => handleUpdateRow(key, "TindakLanjut", e.target.value)}
+    />
+  </TableCell>
+ <TableCell>
+                        {row.photo ? (
+                          <>
+                          <div className="w-32">
+                            <img
+                              src={row.photo}
+                              alt={`Uploaded-${key}`}
+                              className="w-32 h-32 object-cover border"
+                            />
+                          </div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handlePhotoUpload(key, e)}
+                              style={{ display: "none" }}
+                              id={`file-input-${key}`}
+                            />
+                            <label htmlFor={`file-input-${key}`}>
+                              <Button
+                              sx={{"@media print" : {
+                                display : "none"
+                              }}}
+                                variant="contained"
+                                style={{ marginTop: "10px" }}
+                                component="span"
+                              >
+                                Ubah Foto
+                              </Button>
+                            </label>
+                          </>
+                        ) : (
+                          <input
+                          className="print:hidden"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handlePhotoUpload(key, e)}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell
+                        className="no-print"
+                        sx={{
+                          "@media print": {
+                            display: "none",
+                          },
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleSaveRow(key)}
+                        >
+                          Simpan
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleDeleteRow(key)}
+                          style={{ marginLeft: "8px" }}
+                        >
+                          Hapus
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      Belum Ada Pelanggaran
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Button
+            sx={{
+              "@media print": {
+                display: "none",
+              },
+            }}
+            variant="contained"
+            color="primary"
+            onClick={handleAddRow}
+            className="no-print"
+          >
+            Tambah Baris
+          </Button>
+        </>
+      ) : Input ? (
+        null
+      ) : (
+        <h1>Masukkan Nama Minimal 2 Kata</h1>
+      )}
+
+      <Button
+        sx={{
+          "@media print": {
+            display: "none",
+          },
+        }}
+        onClick={() => window.print()}
+        className="no-print"
+        endIcon={<FaPrint />}
+      ></Button>
+    </div>
+  );
+};
+
+export default Home;

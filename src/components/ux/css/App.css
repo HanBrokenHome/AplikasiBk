@@ -1,0 +1,38 @@
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+            }
+
+            .bg-slate-900 {
+              background-color: #ffffff !important;
+              color: #000000 !important;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              page-break-after: always;
+            }
+
+            table th, table td {
+              padding: 8px;
+              text-align: left;
+              border: 1px solid #000;
+            }
+
+            table th {
+              background-color: #f0f0f0;
+            }
+
+            @page {
+              size: A4;
+              margin: 20mm;
+            }
+
+            .header-print {
+              display: block;
+              text-align: center;
+              margin-bottom: 10px;
+            }
+          }

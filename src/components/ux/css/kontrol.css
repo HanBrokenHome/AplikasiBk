@@ -1,0 +1,5 @@
+@media print {
+  .content-area {
+    padding: 0 !important;  /* Menghapus padding dengan force */
+  }
+}
